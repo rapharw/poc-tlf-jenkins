@@ -1,0 +1,20 @@
+name: Build Gradle
+
+on:
+  release:
+    types: [ created ]
+    
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Download Heroku CLI
+        run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+      
+      - name: Heroku Login
+        run: heroku login
