@@ -13,36 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      # - name: '[trivy] download & install scan'
-      #   run: | 
-      #     sudo apt-get install rpm
-      #     wget https://github.com/aquasecurity/trivy/releases/download/v0.31.3/trivy_0.31.3_Linux-64bit.deb
-      #     sudo dpkg -i trivy_0.31.3_Linux-64bit.deb
-      #     trivy -v
-
-      - name: '[azure] acr login'
-        uses: azure/docker-login@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          login-server: ${{ secrets.REGISTRY_HOST }}
+          registry: ${{ secrets.REGISTRY_HOST }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      # - name: '[azure] acr build and push'
-      #   run: |
-      #     docker build -t ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_REPOSITORY }}:${{ secrets.REGISTRY_TAG }} ./../../image/ 
-      #     docker image push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_REPOSITORY }}:${{ secrets.REGISTRY_TAG }}
-
-
-       # Build and push to Azure Container Registry
-      - name: '[azure] acr build & push'
-        uses: Azure/acr-build@v1
+      - name: Build and push
+        uses: docker/build-push-action@v3
         with:
-          service_principal: ${{ secrets.SERVICE_PRINCIPAL }}
-          service_principal_password: ${{ secrets.SERVICE_PRINCIPAL_PASS }}
-          tenant: ${{ secrets.TENANT_ID }}
-          registry: ${{ secrets.REGISTRY_HOST }}
-          repository: ${{ secrets.REGISTRY_REPOSITORY }}
-          image: img
-          folder: img
-          tag: ${{ secrets.REGISTRY_TAG }}
-          branch: main
+          push: true
+          tags: ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_REPOSITORY }}:${{ secrets.REGISTRY_TAG }}
