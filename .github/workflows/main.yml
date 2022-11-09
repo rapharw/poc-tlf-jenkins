@@ -13,12 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      # - name: '[trivy] download & install scan'
-      #   run: | 
-      #     sudo apt-get install rpm
-      #     wget https://github.com/aquasecurity/trivy/releases/download/v0.31.3/trivy_0.31.3_Linux-64bit.deb
-      #     sudo dpkg -i trivy_0.31.3_Linux-64bit.deb
-      #     trivy -v
+      - name: '[trivy] download & install scan'
+        run: | 
+          sudo apt-get install rpm
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.31.3/trivy_0.31.3_Linux-64bit.deb
+          sudo dpkg -i trivy_0.31.3_Linux-64bit.deb
+          trivy -v
 
       - name: '[azure] acr login'
         uses: azure/docker-login@v1
@@ -29,7 +29,7 @@ jobs:
 
       - name: '[azure] acr build and push'
         run: |
-          docker build . -t ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_REPOSITORY }}:${{ secrets.REGISTRY_TAG }}
+          docker build ./../../image/ -t ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_REPOSITORY }}:${{ secrets.REGISTRY_TAG }}
           docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_REPOSITORY }}:${{ secrets.REGISTRY_TAG }}
 
       
