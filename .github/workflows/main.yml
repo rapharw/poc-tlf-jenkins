@@ -1,4 +1,4 @@
-name: Build Heroku
+name: Build
 
 on:
   release:
@@ -13,18 +13,23 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: '[heroku] download & install CLI'
-        run: curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+      # - name: '[trivy] download & install scan'
+      #   run: | 
+      #     sudo apt-get install rpm
+      #     wget https://github.com/aquasecurity/trivy/releases/download/v0.31.3/trivy_0.31.3_Linux-64bit.deb
+      #     sudo dpkg -i trivy_0.31.3_Linux-64bit.deb
+      #     trivy -v
 
-      # - name: '[heroku] set container'
-      #   run: heroku stack:set container --app telefonica-jenkins
+      - name: '[azure] acr login'
+        uses: azure/docker-login@v1
+        with:
+          login-server: ${{ secrets.REGISTRY_HOST }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      # - name: '[heroku] Get API Key'
-      #   id: heroku-api-key
-      #   run: heroku auth:token >> $GITHUB_OUTPUT
-        
-      # - name: Show API Key
-      #   run: echo "API Key is ( ${{ steps.heroku-api-key.outputs }} )"
-        
-#       - name: Heroku Login
-#         run: heroku login
+      - name: '[azure] acr build and push'
+        run: |
+          docker build . -t ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_REPOSITORY }}:${{ secrets.REGISTRY_TAG }}
+          docker push ${{ secrets.REGISTRY_HOST }}/${{ secrets.REGISTRY_REPOSITORY }}:${{ secrets.REGISTRY_TAG }}
+
+      
